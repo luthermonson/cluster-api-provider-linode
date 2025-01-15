@@ -20,6 +20,10 @@ import (
 	"strings"
 	"unsafe"
 
+	corev1 "k8s.io/api/core/v1"
+
+	"sigs.k8s.io/cluster-api/errors"
+
 	"github.com/linode/linodego"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
@@ -52,11 +56,6 @@ func Convert_v1alpha2_NetworkSpec_To_v1alpha1_NetworkSpec(in *infrastructurev1al
 func Convert_v1alpha2_LinodeMachineSpec_To_v1alpha1_LinodeMachineSpec(in *infrastructurev1alpha2.LinodeMachineSpec, out *LinodeMachineSpec, s conversion.Scope) error {
 	// Ok to use the auto-generated conversion function, it simply drops the PlacementGroupRef, and copies everything else
 	return autoConvert_v1alpha2_LinodeMachineSpec_To_v1alpha1_LinodeMachineSpec(in, out, s)
-}
-
-func Convert_v1alpha2_LinodeMachineStatus_To_v1alpha1_LinodeMachineStatus(in *infrastructurev1alpha2.LinodeMachineStatus, out *LinodeMachineStatus, s conversion.Scope) error {
-	// Ok to use the auto-generated conversion function
-	return autoConvert_v1alpha2_LinodeMachineStatus_To_v1alpha1_LinodeMachineStatus(in, out, s)
 }
 
 func Convert_v1alpha1_LinodeMachineSpec_To_v1alpha2_LinodeMachineSpec(in *LinodeMachineSpec, out *infrastructurev1alpha2.LinodeMachineSpec, s conversion.Scope) error {
@@ -144,6 +143,42 @@ func Convert_v1alpha2_VPCSubnetCreateOptions_To_v1alpha1_VPCSubnetCreateOptions(
 	return autoConvert_v1alpha2_VPCSubnetCreateOptions_To_v1alpha1_VPCSubnetCreateOptions(in, out, scope)
 }
 
+func Convert_v1alpha2_LinodeClusterStatus_To_v1alpha1_LinodeClusterStatus(in *v1alpha2.LinodeClusterStatus, out *LinodeClusterStatus, s conversion.Scope) error {
+	out.Ready = in.Ready
+	out.FailureReason = (*errors.ClusterStatusError)(unsafe.Pointer(in.FailureReason))
+	out.FailureMessage = (*string)(unsafe.Pointer(in.FailureMessage))
+	out.Conditions = convertToClusterV1Condition(in.Conditions)
+	return nil
+}
+
+func Convert_v1alpha2_LinodeMachineStatus_To_v1alpha1_LinodeMachineStatus(in *v1alpha2.LinodeMachineStatus, out *LinodeMachineStatus, s conversion.Scope) error {
+	out.Ready = in.Ready
+	out.Addresses = *(*[]v1beta1.MachineAddress)(unsafe.Pointer(&in.Addresses))
+	// WARNING: in.CloudinitMetadataSupport requires manual conversion: does not exist in peer-type
+	out.InstanceState = (*linodego.InstanceStatus)(unsafe.Pointer(in.InstanceState))
+	out.FailureReason = (*errors.MachineStatusError)(unsafe.Pointer(in.FailureReason))
+	out.FailureMessage = (*string)(unsafe.Pointer(in.FailureMessage))
+	out.Conditions = convertToClusterV1Condition(in.Conditions)
+	return nil
+}
+
+func Convert_v1alpha2_LinodeVPCStatus_To_v1alpha1_LinodeVPCStatus(in *v1alpha2.LinodeVPCStatus, out *LinodeVPCStatus, s conversion.Scope) error {
+	out.Ready = in.Ready
+	out.FailureReason = (*VPCStatusError)(unsafe.Pointer(in.FailureReason))
+	out.FailureMessage = (*string)(unsafe.Pointer(in.FailureMessage))
+	out.Conditions = convertToClusterV1Condition(in.Conditions)
+	return nil
+}
+
+func Convert_v1alpha2_LinodeObjectStorageBucketStatus_To_v1alpha1_LinodeObjectStorageBucketStatus(in *v1alpha2.LinodeObjectStorageBucketStatus, out *LinodeObjectStorageBucketStatus, s conversion.Scope) error {
+	out.Ready = in.Ready
+	out.FailureMessage = (*string)(unsafe.Pointer(in.FailureMessage))
+	out.Conditions = convertToClusterV1Condition(in.Conditions)
+	out.Hostname = (*string)(unsafe.Pointer(in.Hostname))
+	out.CreationTime = (*metav1.Time)(unsafe.Pointer(in.CreationTime))
+	return nil
+}
+
 func convertToMetaV1Condition(conditions clusterv1.Conditions) []metav1.Condition {
 	if len(conditions) == 0 {
 		return nil
@@ -153,6 +188,24 @@ func convertToMetaV1Condition(conditions clusterv1.Conditions) []metav1.Conditio
 		r = append(r, metav1.Condition{
 			Type:               string(cond.Type),
 			Status:             metav1.ConditionStatus(cond.Status),
+			Reason:             cond.Reason,
+			Message:            cond.Message,
+			LastTransitionTime: cond.LastTransitionTime,
+		})
+	}
+
+	return r
+}
+
+func convertToClusterV1Condition(conditions []metav1.Condition) clusterv1.Conditions {
+	if len(conditions) == 0 {
+		return nil
+	}
+	r := make(clusterv1.Conditions, len(conditions))
+	for _, cond := range conditions {
+		r = append(r, clusterv1.Condition{
+			Type:               clusterv1.ConditionType(cond.Type),
+			Status:             corev1.ConditionStatus(cond.Status),
 			Reason:             cond.Reason,
 			Message:            cond.Message,
 			LastTransitionTime: cond.LastTransitionTime,
