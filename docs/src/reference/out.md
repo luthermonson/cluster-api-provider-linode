@@ -1,7 +1,636 @@
 # API Reference
 
 ## Packages
+- [infrastructure.cluster.x-k8s.io/v1alpha1](#infrastructureclusterx-k8siov1alpha1)
 - [infrastructure.cluster.x-k8s.io/v1alpha2](#infrastructureclusterx-k8siov1alpha2)
+
+
+## infrastructure.cluster.x-k8s.io/v1alpha1
+
+
+Package v1alpha1 contains API Schema definitions for the infrastructure v1alpha1 API group
+
+### Resource Types
+- [LinodeCluster](#linodecluster)
+- [LinodeClusterList](#linodeclusterlist)
+- [LinodeClusterTemplate](#linodeclustertemplate)
+- [LinodeClusterTemplateList](#linodeclustertemplatelist)
+- [LinodeMachine](#linodemachine)
+- [LinodeMachineList](#linodemachinelist)
+- [LinodeMachineTemplate](#linodemachinetemplate)
+- [LinodeMachineTemplateList](#linodemachinetemplatelist)
+- [LinodeObjectStorageBucket](#linodeobjectstoragebucket)
+- [LinodeObjectStorageBucketList](#linodeobjectstoragebucketlist)
+- [LinodeVPC](#linodevpc)
+- [LinodeVPCList](#linodevpclist)
+
+
+
+#### InstanceConfigInterfaceCreateOptions
+
+
+
+InstanceConfigInterfaceCreateOptions defines network interface config
+
+
+
+_Appears in:_
+- [LinodeMachineSpec](#linodemachinespec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ipamAddress` _string_ |  |  |  |
+| `label` _string_ |  |  | MaxLength: 63 <br />MinLength: 3 <br /> |
+| `purpose` _[ConfigInterfacePurpose](#configinterfacepurpose)_ |  |  |  |
+| `primary` _boolean_ |  |  |  |
+| `subnetId` _integer_ |  |  |  |
+| `ipv4` _[VPCIPv4](#vpcipv4)_ |  |  |  |
+| `ipRanges` _string array_ |  |  |  |
+
+
+#### InstanceDisk
+
+
+
+InstanceDisk defines a list of disks to use for an instance
+
+
+
+_Appears in:_
+- [LinodeMachineSpec](#linodemachinespec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `diskID` _integer_ | DiskID is the linode assigned ID of the disk |  |  |
+| `size` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#quantity-resource-api)_ | Size of the disk in resource.Quantity notation |  | Required: \{\} <br /> |
+| `label` _string_ | Label for the instance disk, if nothing is provided it will match the device name |  |  |
+| `filesystem` _string_ | Filesystem of disk to provision, the default disk filesystem is "ext4" |  | Enum: [raw swap ext3 ext4 initrd] <br /> |
+
+
+
+
+
+
+#### LinodeCluster
+
+
+
+LinodeCluster is the Schema for the linodeclusters API
+
+
+
+_Appears in:_
+- [LinodeClusterList](#linodeclusterlist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeCluster` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[LinodeClusterSpec](#linodeclusterspec)_ |  |  |  |
+| `status` _[LinodeClusterStatus](#linodeclusterstatus)_ |  |  |  |
+
+
+#### LinodeClusterList
+
+
+
+LinodeClusterList contains a list of LinodeCluster
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeClusterList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[LinodeCluster](#linodecluster) array_ |  |  |  |
+
+
+#### LinodeClusterSpec
+
+
+
+LinodeClusterSpec defines the desired state of LinodeCluster
+
+
+
+_Appears in:_
+- [LinodeCluster](#linodecluster)
+- [LinodeClusterTemplateResource](#linodeclustertemplateresource)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `region` _string_ | The Linode Region the LinodeCluster lives in. |  |  |
+| `controlPlaneEndpoint` _[APIEndpoint](#apiendpoint)_ | ControlPlaneEndpoint represents the endpoint used to communicate with the LinodeCluster control plane.<br />If ControlPlaneEndpoint is unset then the Nodebalancer ip will be used. |  |  |
+| `network` _[NetworkSpec](#networkspec)_ | NetworkSpec encapsulates all things related to Linode network. |  |  |
+| `vpcRef` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectreference-v1-core)_ |  |  |  |
+| `credentialsRef` _[SecretReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#secretreference-v1-core)_ | CredentialsRef is a reference to a Secret that contains the credentials to use for provisioning this cluster. If not<br />supplied then the credentials of the controller will be used. |  |  |
+
+
+#### LinodeClusterStatus
+
+
+
+LinodeClusterStatus defines the observed state of LinodeCluster
+
+
+
+_Appears in:_
+- [LinodeCluster](#linodecluster)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ready` _boolean_ | Ready denotes that the cluster (infrastructure) is ready. |  |  |
+| `failureReason` _[ClusterStatusError](#clusterstatuserror)_ | FailureReason will be set in the event that there is a terminal problem<br />reconciling the LinodeCluster and will contain a succinct value suitable<br />for machine interpretation. |  |  |
+| `failureMessage` _string_ | FailureMessage will be set in the event that there is a terminal problem<br />reconciling the LinodeCluster and will contain a more verbose string suitable<br />for logging and human consumption. |  |  |
+| `conditions` _[Conditions](#conditions)_ | Conditions defines current service state of the LinodeCluster. |  |  |
+
+
+#### LinodeClusterTemplate
+
+
+
+LinodeClusterTemplate is the Schema for the linodeclustertemplates API
+
+
+
+_Appears in:_
+- [LinodeClusterTemplateList](#linodeclustertemplatelist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeClusterTemplate` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[LinodeClusterTemplateSpec](#linodeclustertemplatespec)_ |  |  |  |
+
+
+#### LinodeClusterTemplateList
+
+
+
+LinodeClusterTemplateList contains a list of LinodeClusterTemplate
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeClusterTemplateList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[LinodeClusterTemplate](#linodeclustertemplate) array_ |  |  |  |
+
+
+#### LinodeClusterTemplateResource
+
+
+
+LinodeClusterTemplateResource describes the data needed to create a LinodeCluster from a template.
+
+
+
+_Appears in:_
+- [LinodeClusterTemplateSpec](#linodeclustertemplatespec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `spec` _[LinodeClusterSpec](#linodeclusterspec)_ |  |  |  |
+
+
+#### LinodeClusterTemplateSpec
+
+
+
+LinodeClusterTemplateSpec defines the desired state of LinodeClusterTemplate
+
+
+
+_Appears in:_
+- [LinodeClusterTemplate](#linodeclustertemplate)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `template` _[LinodeClusterTemplateResource](#linodeclustertemplateresource)_ |  |  |  |
+
+
+#### LinodeMachine
+
+
+
+LinodeMachine is the Schema for the linodemachines API
+
+
+
+_Appears in:_
+- [LinodeMachineList](#linodemachinelist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeMachine` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[LinodeMachineSpec](#linodemachinespec)_ |  |  |  |
+| `status` _[LinodeMachineStatus](#linodemachinestatus)_ |  |  |  |
+
+
+#### LinodeMachineList
+
+
+
+LinodeMachineList contains a list of LinodeMachine
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeMachineList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[LinodeMachine](#linodemachine) array_ |  |  |  |
+
+
+#### LinodeMachineSpec
+
+
+
+LinodeMachineSpec defines the desired state of LinodeMachine
+
+
+
+_Appears in:_
+- [LinodeMachine](#linodemachine)
+- [LinodeMachineTemplateResource](#linodemachinetemplateresource)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `providerID` _string_ | ProviderID is the unique identifier as specified by the cloud provider. |  |  |
+| `instanceID` _integer_ | InstanceID is the Linode instance ID for this machine. |  |  |
+| `region` _string_ |  |  | Required: \{\} <br /> |
+| `type` _string_ |  |  | Required: \{\} <br /> |
+| `group` _string_ |  |  |  |
+| `rootPass` _string_ |  |  |  |
+| `authorizedKeys` _string array_ |  |  |  |
+| `authorizedUsers` _string array_ |  |  |  |
+| `backupID` _integer_ |  |  |  |
+| `image` _string_ |  |  |  |
+| `interfaces` _[InstanceConfigInterfaceCreateOptions](#instanceconfiginterfacecreateoptions) array_ |  |  |  |
+| `backupsEnabled` _boolean_ |  |  |  |
+| `privateIP` _boolean_ |  |  |  |
+| `tags` _string array_ |  |  |  |
+| `firewallID` _integer_ |  |  |  |
+| `osDisk` _[InstanceDisk](#instancedisk)_ | OSDisk is configuration for the root disk that includes the OS,<br />if not specified this defaults to whatever space is not taken up by the DataDisks |  |  |
+| `dataDisks` _object (keys:string, values:[InstanceDisk](#instancedisk))_ | DataDisks is a map of any additional disks to add to an instance,<br />The sum of these disks + the OSDisk must not be more than allowed on a linodes plan |  |  |
+| `credentialsRef` _[SecretReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#secretreference-v1-core)_ | CredentialsRef is a reference to a Secret that contains the credentials<br />to use for provisioning this machine. If not supplied then these<br />credentials will be used in-order:<br />  1. LinodeMachine<br />  2. Owner LinodeCluster<br />  3. Controller |  |  |
+
+
+#### LinodeMachineStatus
+
+
+
+LinodeMachineStatus defines the observed state of LinodeMachine
+
+
+
+_Appears in:_
+- [LinodeMachine](#linodemachine)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ready` _boolean_ | Ready is true when the provider resource is ready. | false |  |
+| `addresses` _MachineAddress array_ | Addresses contains the Linode instance associated addresses. |  |  |
+| `instanceState` _[InstanceStatus](#instancestatus)_ | InstanceState is the state of the Linode instance for this machine. |  |  |
+| `failureReason` _[MachineStatusError](#machinestatuserror)_ | FailureReason will be set in the event that there is a terminal problem<br />reconciling the Machine and will contain a succinct value suitable<br />for machine interpretation.<br /><br />This field should not be set for transitive errors that a controller<br />faces that are expected to be fixed automatically over<br />time (like service outages), but instead indicate that something is<br />fundamentally wrong with the Machine's spec or the configuration of<br />the controller, and that manual intervention is required. Examples<br />of terminal errors would be invalid combinations of settings in the<br />spec, values that are unsupported by the controller, or the<br />responsible controller itself being critically misconfigured.<br /><br />Any transient errors that occur during the reconciliation of Machines<br />can be added as events to the Machine object and/or logged in the<br />controller's output. |  |  |
+| `failureMessage` _string_ | FailureMessage will be set in the event that there is a terminal problem<br />reconciling the Machine and will contain a more verbose string suitable<br />for logging and human consumption.<br /><br />This field should not be set for transitive errors that a controller<br />faces that are expected to be fixed automatically over<br />time (like service outages), but instead indicate that something is<br />fundamentally wrong with the Machine's spec or the configuration of<br />the controller, and that manual intervention is required. Examples<br />of terminal errors would be invalid combinations of settings in the<br />spec, values that are unsupported by the controller, or the<br />responsible controller itself being critically misconfigured.<br /><br />Any transient errors that occur during the reconciliation of Machines<br />can be added as events to the Machine object and/or logged in the<br />controller's output. |  |  |
+| `conditions` _[Conditions](#conditions)_ | Conditions defines current service state of the LinodeMachine. |  |  |
+
+
+#### LinodeMachineTemplate
+
+
+
+LinodeMachineTemplate is the Schema for the linodemachinetemplates API
+
+
+
+_Appears in:_
+- [LinodeMachineTemplateList](#linodemachinetemplatelist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeMachineTemplate` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[LinodeMachineTemplateSpec](#linodemachinetemplatespec)_ |  |  |  |
+
+
+#### LinodeMachineTemplateList
+
+
+
+LinodeMachineTemplateList contains a list of LinodeMachineTemplate
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeMachineTemplateList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[LinodeMachineTemplate](#linodemachinetemplate) array_ |  |  |  |
+
+
+#### LinodeMachineTemplateResource
+
+
+
+LinodeMachineTemplateResource describes the data needed to create a LinodeMachine from a template.
+
+
+
+_Appears in:_
+- [LinodeMachineTemplateSpec](#linodemachinetemplatespec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `spec` _[LinodeMachineSpec](#linodemachinespec)_ |  |  |  |
+
+
+#### LinodeMachineTemplateSpec
+
+
+
+LinodeMachineTemplateSpec defines the desired state of LinodeMachineTemplate
+
+
+
+_Appears in:_
+- [LinodeMachineTemplate](#linodemachinetemplate)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `template` _[LinodeMachineTemplateResource](#linodemachinetemplateresource)_ |  |  |  |
+
+
+#### LinodeObjectStorageBucket
+
+
+
+LinodeObjectStorageBucket is the Schema for the linodeobjectstoragebuckets API
+
+
+
+_Appears in:_
+- [LinodeObjectStorageBucketList](#linodeobjectstoragebucketlist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeObjectStorageBucket` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[LinodeObjectStorageBucketSpec](#linodeobjectstoragebucketspec)_ |  |  |  |
+| `status` _[LinodeObjectStorageBucketStatus](#linodeobjectstoragebucketstatus)_ |  |  |  |
+
+
+#### LinodeObjectStorageBucketList
+
+
+
+LinodeObjectStorageBucketList contains a list of LinodeObjectStorageBucket
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeObjectStorageBucketList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[LinodeObjectStorageBucket](#linodeobjectstoragebucket) array_ |  |  |  |
+
+
+#### LinodeObjectStorageBucketSpec
+
+
+
+LinodeObjectStorageBucketSpec defines the desired state of LinodeObjectStorageBucket
+
+
+
+_Appears in:_
+- [LinodeObjectStorageBucket](#linodeobjectstoragebucket)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `cluster` _string_ | Cluster is the ID of the Object Storage cluster for the bucket. |  |  |
+| `credentialsRef` _[SecretReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#secretreference-v1-core)_ | CredentialsRef is a reference to a Secret that contains the credentials to use for provisioning the bucket.<br />If not supplied then the credentials of the controller will be used. |  |  |
+| `keyGeneration` _integer_ | KeyGeneration may be modified to trigger rotations of access keys created for the bucket. | 0 |  |
+| `secretType` _string_ | SecretType sets the type for the bucket-details secret that will be generated by the controller. | addons.cluster.x-k8s.io/resource-set |  |
+
+
+#### LinodeObjectStorageBucketStatus
+
+
+
+LinodeObjectStorageBucketStatus defines the observed state of LinodeObjectStorageBucket
+
+
+
+_Appears in:_
+- [LinodeObjectStorageBucket](#linodeobjectstoragebucket)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ready` _boolean_ | Ready denotes that the bucket has been provisioned along with access keys. | false |  |
+| `failureMessage` _string_ | FailureMessage will be set in the event that there is a terminal problem<br />reconciling the Object Storage Bucket and will contain a verbose string<br />suitable for logging and human consumption. |  |  |
+| `conditions` _[Conditions](#conditions)_ | Conditions specify the service state of the LinodeObjectStorageBucket. |  |  |
+| `hostname` _string_ | Hostname is the address assigned to the bucket. |  |  |
+| `creationTime` _[Time](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#time-v1-meta)_ | CreationTime specifies the creation timestamp for the bucket. |  |  |
+| `lastKeyGeneration` _integer_ | LastKeyGeneration tracks the last known value of .spec.keyGeneration. |  |  |
+| `keySecretName` _string_ | KeySecretName specifies the name of the Secret containing access keys for the bucket. |  |  |
+| `accessKeyRefs` _integer array_ | AccessKeyRefs stores IDs for Object Storage keys provisioned along with the bucket. |  |  |
+
+
+#### LinodeVPC
+
+
+
+LinodeVPC is the Schema for the linodemachines API
+
+
+
+_Appears in:_
+- [LinodeVPCList](#linodevpclist)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeVPC` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[LinodeVPCSpec](#linodevpcspec)_ |  |  |  |
+| `status` _[LinodeVPCStatus](#linodevpcstatus)_ |  |  |  |
+
+
+#### LinodeVPCList
+
+
+
+LinodeVPCList contains a list of LinodeVPC
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `infrastructure.cluster.x-k8s.io/v1alpha1` | | |
+| `kind` _string_ | `LinodeVPCList` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `items` _[LinodeVPC](#linodevpc) array_ |  |  |  |
+
+
+#### LinodeVPCSpec
+
+
+
+LinodeVPCSpec defines the desired state of LinodeVPC
+
+
+
+_Appears in:_
+- [LinodeVPC](#linodevpc)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `vpcID` _integer_ |  |  |  |
+| `description` _string_ |  |  |  |
+| `region` _string_ |  |  |  |
+| `subnets` _[VPCSubnetCreateOptions](#vpcsubnetcreateoptions) array_ |  |  |  |
+| `credentialsRef` _[SecretReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#secretreference-v1-core)_ | CredentialsRef is a reference to a Secret that contains the credentials to use for provisioning this VPC. If not<br />supplied then the credentials of the controller will be used. |  |  |
+
+
+#### LinodeVPCStatus
+
+
+
+LinodeVPCStatus defines the observed state of LinodeVPC
+
+
+
+_Appears in:_
+- [LinodeVPC](#linodevpc)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ready` _boolean_ | Ready is true when the provider resource is ready. | false |  |
+| `failureReason` _[VPCStatusError](#vpcstatuserror)_ | FailureReason will be set in the event that there is a terminal problem<br />reconciling the VPC and will contain a succinct value suitable<br />for machine interpretation.<br /><br />This field should not be set for transitive errors that a controller<br />faces that are expected to be fixed automatically over<br />time (like service outages), but instead indicate that something is<br />fundamentally wrong with the VPC's spec or the configuration of<br />the controller, and that manual intervention is required. Examples<br />of terminal errors would be invalid combinations of settings in the<br />spec, values that are unsupported by the controller, or the<br />responsible controller itself being critically misconfigured.<br /><br />Any transient errors that occur during the reconciliation of VPCs<br />can be added as events to the VPC object and/or logged in the<br />controller's output. |  |  |
+| `failureMessage` _string_ | FailureMessage will be set in the event that there is a terminal problem<br />reconciling the VPC and will contain a more verbose string suitable<br />for logging and human consumption.<br /><br />This field should not be set for transitive errors that a controller<br />faces that are expected to be fixed automatically over<br />time (like service outages), but instead indicate that something is<br />fundamentally wrong with the VPC's spec or the configuration of<br />the controller, and that manual intervention is required. Examples<br />of terminal errors would be invalid combinations of settings in the<br />spec, values that are unsupported by the controller, or the<br />responsible controller itself being critically misconfigured.<br /><br />Any transient errors that occur during the reconciliation of VPCs<br />can be added as events to the VPC object and/or logged in the<br />controller's output. |  |  |
+| `conditions` _[Conditions](#conditions)_ | Conditions defines current service state of the LinodeVPC. |  |  |
+
+
+#### NetworkSpec
+
+
+
+NetworkSpec encapsulates Linode networking resources.
+
+
+
+_Appears in:_
+- [LinodeClusterSpec](#linodeclusterspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `loadBalancerType` _string_ | LoadBalancerType is the type of load balancer to use, defaults to NodeBalancer if not otherwise set |  | Enum: [NodeBalancer] <br /> |
+| `loadBalancerPort` _integer_ | LoadBalancerPort used by the api server. It must be valid ports range (1-65535). If omitted, default value is 6443. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
+| `nodeBalancerID` _integer_ | NodeBalancerID is the id of api server NodeBalancer. |  |  |
+| `nodeBalancerConfigID` _integer_ | NodeBalancerConfigID is the config ID of api server NodeBalancer. |  |  |
+
+
+#### VPCIPv4
+
+
+
+VPCIPv4 defines VPC IPV4 settings
+
+
+
+_Appears in:_
+- [InstanceConfigInterfaceCreateOptions](#instanceconfiginterfacecreateoptions)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `vpc` _string_ |  |  |  |
+| `nat1to1` _string_ |  |  |  |
+
+
+#### VPCStatusError
+
+_Underlying type:_ _string_
+
+VPCStatusError defines errors states for VPC objects.
+
+
+
+_Appears in:_
+- [LinodeVPCStatus](#linodevpcstatus)
+
+| Field | Description |
+| --- | --- |
+| `CreateError` | CreateVPCError indicates that an error was encountered<br />when trying to create the VPC.<br /> |
+| `UpdateError` | UpdateVPCError indicates that an error was encountered<br />when trying to update the VPC.<br /> |
+| `DeleteError` | DeleteVPCError indicates that an error was encountered<br />when trying to delete the VPC.<br /> |
+
+
+#### VPCSubnetCreateOptions
+
+
+
+VPCSubnetCreateOptions defines subnet options
+
+
+
+_Appears in:_
+- [LinodeVPCSpec](#linodevpcspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `label` _string_ |  |  | MaxLength: 63 <br />MinLength: 3 <br /> |
+| `ipv4` _string_ |  |  |  |
+
 
 
 ## infrastructure.cluster.x-k8s.io/v1alpha2

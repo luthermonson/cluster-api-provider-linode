@@ -34,6 +34,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	infrav1 "github.com/linode/cluster-api-provider-linode/api/v1alpha1"
 	infrav2 "github.com/linode/cluster-api-provider-linode/api/v1alpha2"
 
 	// +kubebuilder:scaffold:imports
@@ -130,6 +131,7 @@ var _ = BeforeSuite(func() {
 	cfg, _ = testEnv.Start()
 	Expect(cfg).NotTo(BeNil())
 
+	Expect(infrav1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(infrav2.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(clusterv1.AddToScheme(scheme.Scheme)).To(Succeed())
 
